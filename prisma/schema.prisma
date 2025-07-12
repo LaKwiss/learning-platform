@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum DailyGoal {
+  FIVE_MIN
+  TEN_MIN
+  FIFTEEN_MIN
+  TWENTY_MIN
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TEXT
+  TRUE_FALSE
+}
+
+// --- Modèles de Données ---
+
+model User {
+  id      String @id @default(cuid())
+  clerkId String @unique
+
+  activeModuleId String?
+  activeModule   Module? @relation(fields: [activeModuleId], references: [id])
+
+  dailyGoal DailyGoal?
+
+  completedQuestions QuestionCompletion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Module {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User User[]
+
+  Question Question[]
+}
+
+model Question {
+  id    String @id @default(cuid())
+  title String
+
+  type    QuestionType @default(SINGLE_CHOICE)
+  content Json?
+
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  QuestionCompletion QuestionCompletion[]
+}
+
+model QuestionCompletion {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  durationInSeconds Int
+
+  completedAt DateTime @default(now())
+
+  @@id([userId, questionId])
+}
