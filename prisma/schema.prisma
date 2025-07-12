@@ -34,7 +34,8 @@ model User {
   activeModuleId String?
   activeModule   Module? @relation(fields: [activeModuleId], references: [id])
 
-  dailyGoal DailyGoal?
+  dailyGoal         DailyGoal?
+  onboardingOptions Json?
 
   completedQuestions QuestionCompletion[]
 
