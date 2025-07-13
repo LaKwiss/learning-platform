@@ -57,6 +57,7 @@ export default function Step3({ onNext, onBack, value, onChange }: Step3Props) {
                     value={value}
                     onSelectionChange={onChange}
                     layout="list"
+                    onTryAgain={() => {}}
                 />
             </main>
 

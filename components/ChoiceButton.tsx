@@ -1,6 +1,5 @@
-// src/components/ChoiceButton.tsx
 import React from "react";
-import { clsx } from "clsx"; // Utilitaire pour les classes conditionnelles
+import { clsx } from "clsx";
 
 type ChoiceButtonProps = {
     id: string | number;
@@ -8,15 +7,16 @@ type ChoiceButtonProps = {
     icon?: React.ReactNode;
     isSelected: boolean;
     onSelect: (id: string | number) => void;
+    isRevealedAsCorrect?: boolean;
 };
 
-// On utilise React.memo pour éviter les re-renderings inutiles
 export const ChoiceButton = React.memo(function ChoiceButton({
     id,
     label,
     icon,
     isSelected,
     onSelect,
+    isRevealedAsCorrect,
 }: ChoiceButtonProps) {
     const buttonClasses = clsx(
         "p-4 rounded-lg cursor-pointer transition-all duration-200 text-left border-2 w-full flex items-center",
@@ -24,6 +24,7 @@ export const ChoiceButton = React.memo(function ChoiceButton({
             "border-blue-500 bg-blue-50 shadow-md": isSelected,
             "border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm":
                 !isSelected,
+            "!border-green-500 !bg-green-50": isRevealedAsCorrect,
         }
     );
 

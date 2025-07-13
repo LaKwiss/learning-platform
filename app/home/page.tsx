@@ -2,6 +2,8 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import NextButton from "../../components/NextButton";
 
 /**
  * Ce composant se charge de faire la configuration initiale de l'utilisateur
@@ -80,6 +82,11 @@ function InitialSetupTrigger({ user }) {
 export default function HomePage() {
     // Le hook useUser rend ce composant un "Client Component".
     const { isLoaded, isSignedIn, user } = useUser();
+    const router = useRouter();
+
+    const handleChooseCourse = () => {
+        router.push("/select-course");
+    };
 
     // Pendant que Clerk charge l'état de l'utilisateur, on peut afficher un loader.
     // Cela évite un flash de contenu vide ou de la page de connexion.
@@ -109,6 +116,11 @@ export default function HomePage() {
                 <p className="mt-2 text-lg text-gray-600">
                     Bienvenue sur votre nouvelle plateforme d'apprentissage.
                 </p>
+                <div className="mt-8">
+                    <NextButton onClick={handleChooseCourse}>
+                        Choisir un cours
+                    </NextButton>
+                </div>
             </div>
         </div>
     );

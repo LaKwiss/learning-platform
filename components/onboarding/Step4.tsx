@@ -69,6 +69,7 @@ export default function Step4({
                     value={value}
                     onSelectionChange={onChange}
                     layout="list"
+                    onTryAgain={() => {}}
                 />
             </main>
 

@@ -4,39 +4,37 @@ import React from "react";
 import { clsx } from "clsx";
 import { ChoiceButton } from "./ChoiceButton";
 
-// Les types de données ne changent pas
 type ChoiceItem = {
     id: string | number;
     label: string;
     icon?: React.ReactNode;
 };
 
-// Props communes
 type BaseProps = {
     data: ChoiceItem[];
     layout?: "grid" | "list";
     gridCols?: 1 | 2 | 3 | 4 | 5 | 6;
+    onTryAgain?: () => void;
 };
 
-// Props pour la sélection unique (maintenant contrôlée)
 type SingleSelectProps = BaseProps & {
     allowMultiple?: false;
-    // La valeur est maintenant directement passée en prop
     value: ChoiceItem["id"] | null;
     onSelectionChange: (selectedId: ChoiceItem["id"] | null) => void;
 };
 
-// Props pour la sélection multiple (maintenant contrôlée)
 type MultipleSelectProps = BaseProps & {
     allowMultiple: true;
-    // La valeur est maintenant directement passée en prop
     value: ChoiceItem["id"][];
     onSelectionChange: (selectedIds: ChoiceItem["id"][]) => void;
 };
 
-type MultipleChoiceQuestionProps = SingleSelectProps | MultipleSelectProps;
+// ✅ CORRIGÉ : Les props spécifiques au quiz sont maintenant optionnelles
+type MultipleChoiceQuestionProps = (SingleSelectProps | MultipleSelectProps) & {
+    isRevealed?: boolean;
+    correctAnswerIds?: (string | number)[];
+};
 
-// Constantes définies en dehors du composant pour la performance
 const gridColClasses = {
     1: "grid-cols-1",
     2: "grid-cols-2",
@@ -49,12 +47,42 @@ const gridColClasses = {
 export default function MultipleChoiceQuestion(
     props: MultipleChoiceQuestionProps
 ) {
-    const { data, layout = "grid" } = props;
+    const {
+        data,
+        onTryAgain = () => {},
+        layout: layoutProp,
+        gridCols: gridColsProp,
+        // ✅ CORRIGÉ : On fournit des valeurs par défaut
+        isRevealed = false,
+        correctAnswerIds = [],
+    } = props;
 
-    // Logique de sélection est maintenant gérée ici
+    let layout = layoutProp;
+    let gridCols = gridColsProp;
+
+    if (!layoutProp) {
+        const itemCount = data.length;
+        if (itemCount === 4) {
+            layout = "grid";
+            gridCols = 2;
+        } else if (itemCount === 6) {
+            layout = "grid";
+            gridCols = 3;
+        } else if (itemCount === 8) {
+            layout = "grid";
+            gridCols = 4;
+        } else if (itemCount === 9) {
+            layout = "grid";
+            gridCols = 3;
+        } else {
+            layout = "list";
+        }
+    }
+
     const handleSelect = (id: ChoiceItem["id"]) => {
+        onTryAgain();
+
         if (props.allowMultiple) {
-            // Créer une nouvelle copie basée sur la valeur actuelle
             const currentSelection = new Set(props.value || []);
             if (currentSelection.has(id)) {
                 currentSelection.delete(id);
@@ -63,9 +91,7 @@ export default function MultipleChoiceQuestion(
             }
             props.onSelectionChange(Array.from(currentSelection));
         } else {
-            // Si l'élément sélectionné est cliqué à nouveau, désélectionnez-le. Sinon, sélectionnez-le.
             const newSelection = props.value === id ? null : id;
-            // Type guard to ensure correct argument type for onSelectionChange
             if (typeof props.onSelectionChange === "function") {
                 props.onSelectionChange(newSelection as any);
             }
@@ -74,27 +100,31 @@ export default function MultipleChoiceQuestion(
 
     const containerClasses = clsx({
         "grid gap-4": layout === "grid",
-        [`${gridColClasses[props.gridCols || 3]}`]: layout === "grid",
+        [`${gridColClasses[gridCols || 2]}`]: layout === "grid",
         "flex flex-col gap-3 w-full": layout === "list",
     });
 
     return (
         <div className={containerClasses}>
-            {data.map((item) => (
-                <ChoiceButton
-                    key={item.id}
-                    id={item.id}
-                    label={item.label}
-                    icon={item.icon}
-                    // La vérification de la sélection est maintenant plus simple
-                    isSelected={
-                        props.allowMultiple
-                            ? props.value.includes(item.id)
-                            : props.value === item.id
-                    }
-                    onSelect={handleSelect}
-                />
-            ))}
+            {data.map((item) => {
+                const isSelected = props.allowMultiple
+                    ? props.value.includes(item.id)
+                    : props.value === item.id;
+                const shouldRevealCorrect =
+                    isRevealed && correctAnswerIds.includes(item.id);
+
+                return (
+                    <ChoiceButton
+                        key={item.id}
+                        id={item.id}
+                        label={item.label}
+                        icon={item.icon}
+                        isSelected={isSelected}
+                        onSelect={() => handleSelect(item.id)}
+                        isRevealedAsCorrect={shouldRevealCorrect}
+                    />
+                );
+            })}
         </div>
     );
 }

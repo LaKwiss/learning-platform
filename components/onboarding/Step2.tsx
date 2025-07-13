@@ -46,11 +46,11 @@ export default function Step2({ onNext, onBack, value, onChange }: Step2Props) {
 
                 <MultiChoiceQuestion
                     data={durationData}
-                    // ✅ MISE À JOUR : 'initialSelection' devient 'value'
                     value={value}
                     onSelectionChange={onChange}
                     layout="grid"
                     gridCols={2}
+                    onTryAgain={() => {}}
                 />
             </main>
 
