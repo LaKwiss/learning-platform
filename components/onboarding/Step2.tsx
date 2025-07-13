@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import MultiChoiceQuestion from '../../components/MultipleChoiceQuestion';
-import ProgressBar from '../ProgressBar';
-import { ChevronLeft } from 'lucide-react';
-import NextButton from '../NextButton';
+import MultiChoiceQuestion from "../MultipleChoiceQuestion";
+import ProgressBar from "../ProgressBar";
+import { ChevronLeft } from "lucide-react";
+import NextButton from "../NextButton";
 
 interface Step2Props {
     onNext: () => void;
@@ -28,7 +28,10 @@ export default function Step2({ onNext, onBack, value, onChange }: Step2Props) {
             {/* --- En-tête --- */}
             <header className="p-4 md:p-6">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="text-gray-500 hover:text-black">
+                    <button
+                        onClick={onBack}
+                        className="text-gray-500 hover:text-black"
+                    >
                         <ChevronLeft size={24} />
                     </button>
                     <ProgressBar progress={33} />
@@ -43,8 +46,9 @@ export default function Step2({ onNext, onBack, value, onChange }: Step2Props) {
 
                 <MultiChoiceQuestion
                     data={durationData}
-                    onSelectionChange={(selectedId) => onChange(selectedId as number | null)}
-                    initialSelection={value}
+                    // ✅ MISE À JOUR : 'initialSelection' devient 'value'
+                    value={value}
+                    onSelectionChange={onChange}
                     layout="grid"
                     gridCols={2}
                 />
@@ -52,10 +56,7 @@ export default function Step2({ onNext, onBack, value, onChange }: Step2Props) {
 
             {/* --- Pied de page --- */}
             <footer className="flex justify-center p-4 md:p-6">
-                <NextButton
-                    onClick={onNext}
-                    disabled={isButtonDisabled}
-                >
+                <NextButton onClick={onNext} disabled={isButtonDisabled}>
                     Continue
                 </NextButton>
             </footer>

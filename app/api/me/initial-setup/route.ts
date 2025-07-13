@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
-        // Récupérer l'utilisateur connecté via Clerk
         const { userId } = await auth();
 
         if (!userId) {
@@ -16,11 +15,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Récupérer les données d'onboarding depuis le body
         const body = await request.json();
         const { duration, motivation, focusAreas } = body;
 
-        // Vérifier si l'utilisateur existe déjà
         const existingUser = await prisma.user.findUnique({
             where: { clerkId: userId },
         });
@@ -32,7 +29,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Mapper la durée vers l'enum DailyGoal
         let dailyGoal = null;
         if (duration) {
             switch (duration) {
@@ -53,13 +49,11 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Préparer les options d'onboarding
         const onboardingOptions = {
             motivation: motivation || null,
             focusAreas: focusAreas || [],
         };
 
-        // Créer l'utilisateur
         const user = await prisma.user.upsert({
             where: { clerkId: userId },
             update: {

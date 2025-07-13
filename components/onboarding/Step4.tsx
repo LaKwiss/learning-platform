@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import MultiChoiceQuestion from '../../components/MultipleChoiceQuestion';
-import NextButton from '../../components/NextButton';
-import ProgressBar from '../../components/ProgressBar';
-import { ChevronLeft } from 'lucide-react';
-import Character from './Character';
+import MultiChoiceQuestion from "../MultipleChoiceQuestion";
+import NextButton from "../../components/NextButton";
+import ProgressBar from "../../components/ProgressBar";
+import { ChevronLeft } from "lucide-react";
+import Character from "./Character";
 
 interface Step4Props {
     onFinish: () => void;
@@ -13,24 +13,39 @@ interface Step4Props {
     onChange: (value: string[]) => void;
 }
 
-// Les données pour les choix de réponse
 const focusData = [
-    { id: 'subjects', icon: '🔍', label: "Learning specific subjects" },
-    { id: 'curiosity', icon: '🌍', label: "Following my curiosity" },
-    { id: 'problem_solving', icon: '🧩', label: "Building my problem-solving skills" },
-    { id: 'basics', icon: '✏️', label: "Brushing up on the basics" },
-    { id: 'class_tools', icon: '🖥️', label: "Giving my class the best learning tools" },
-    { id: 'other', icon: '🔌', label: "Something else" },
+    { id: "subjects", icon: "🔍", label: "Learning specific subjects" },
+    { id: "curiosity", icon: "🌍", label: "Following my curiosity" },
+    {
+        id: "problem_solving",
+        icon: "🧩",
+        label: "Building my problem-solving skills",
+    },
+    { id: "basics", icon: "✏️", label: "Brushing up on the basics" },
+    {
+        id: "class_tools",
+        icon: "🖥️",
+        label: "Giving my class the best learning tools",
+    },
+    { id: "other", icon: "🔌", label: "Something else" },
 ];
 
-export default function Step4({ onFinish, onBack, value, onChange }: Step4Props) {
+export default function Step4({
+    onFinish,
+    onBack,
+    value,
+    onChange,
+}: Step4Props) {
     const isButtonDisabled = value.length === 0;
 
     return (
         <div className="flex flex-col min-h-screen bg-white">
             <header className="p-4 md:p-6">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="text-gray-500 hover:text-black">
+                    <button
+                        onClick={onBack}
+                        className="text-gray-500 hover:text-black"
+                    >
                         <ChevronLeft size={24} />
                     </button>
                     <ProgressBar progress={100} />
@@ -48,19 +63,17 @@ export default function Step4({ onFinish, onBack, value, onChange }: Step4Props)
                 </div>
 
                 <MultiChoiceQuestion
-                    data={focusData}
-                    onSelectionChange={(selectedIds) => onChange(selectedIds as string[])}
-                    initialSelection={value}
-                    layout="list"
                     allowMultiple={true}
+                    data={focusData}
+                    // ✅ MISE À JOUR : 'initialSelection' devient 'value'
+                    value={value}
+                    onSelectionChange={onChange}
+                    layout="list"
                 />
             </main>
 
             <footer className="flex justify-center p-4 md:p-6">
-                <NextButton
-                    onClick={onFinish}
-                    disabled={isButtonDisabled}
-                >
+                <NextButton onClick={onFinish} disabled={isButtonDisabled}>
                     Finish
                 </NextButton>
             </footer>

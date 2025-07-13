@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import MultiChoiceQuestion from '../../components/MultipleChoiceQuestion';
-import ProgressBar from '../ProgressBar';
-import { ChevronLeft } from 'lucide-react';
-import NextButton from '../NextButton';
-import Character from './Character';
+import MultiChoiceQuestion from "../MultipleChoiceQuestion";
+import ProgressBar from "../ProgressBar";
+import { ChevronLeft } from "lucide-react";
+import NextButton from "../NextButton";
+import Character from "./Character";
 
 interface Step3Props {
     onNext: () => void;
@@ -13,14 +13,13 @@ interface Step3Props {
     onChange: (value: string | null) => void;
 }
 
-// Les données incluent maintenant une propriété 'icon' avec un emoji
 const motivationData = [
-    { id: 'growth', icon: '📈', label: "Professional growth" },
-    { id: 'sharp', icon: '🎯', label: "Staying sharp" },
-    { id: 'school', icon: '📚', label: "Excelling in school" },
-    { id: 'child', icon: '🚀', label: "Helping my child learn" },
-    { id: 'students', icon: '🍎', label: "Helping my students learn" },
-    { id: 'other', icon: '🦄', label: "Something else" },
+    { id: "growth", icon: "📈", label: "Professional growth" },
+    { id: "sharp", icon: "🎯", label: "Staying sharp" },
+    { id: "school", icon: "📚", label: "Excelling in school" },
+    { id: "child", icon: "🚀", label: "Helping my child learn" },
+    { id: "students", icon: "🍎", label: "Helping my students learn" },
+    { id: "other", icon: "🦄", label: "Something else" },
 ];
 
 export default function Step3({ onNext, onBack, value, onChange }: Step3Props) {
@@ -31,7 +30,10 @@ export default function Step3({ onNext, onBack, value, onChange }: Step3Props) {
             {/* --- En-tête --- */}
             <header className="p-4 md:p-6">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="text-gray-500 hover:text-black">
+                    <button
+                        onClick={onBack}
+                        className="text-gray-500 hover:text-black"
+                    >
                         <ChevronLeft size={24} />
                     </button>
                     <ProgressBar progress={66} />
@@ -51,18 +53,16 @@ export default function Step3({ onNext, onBack, value, onChange }: Step3Props) {
 
                 <MultiChoiceQuestion
                     data={motivationData}
-                    onSelectionChange={(selectedId) => onChange(selectedId as string | null)}
-                    initialSelection={value}
+                    // ✅ MISE À JOUR : 'initialSelection' devient 'value'
+                    value={value}
+                    onSelectionChange={onChange}
                     layout="list"
                 />
             </main>
 
             {/* --- Pied de page --- */}
             <footer className="flex justify-center p-4 md:p-6">
-                <NextButton
-                    onClick={onNext}
-                    disabled={isButtonDisabled}
-                >
+                <NextButton onClick={onNext} disabled={isButtonDisabled}>
                     Continue
                 </NextButton>
             </footer>
