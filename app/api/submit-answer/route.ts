@@ -15,7 +15,9 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { questionId, submittedAnswer } = body;
+        // Le `submittedAnswerText` n'est pas utilisé pour la validation,
+        // mais il est inclus comme demandé.
+        const { questionId, submittedAnswer, submittedAnswerText } = body;
 
         if (!questionId || submittedAnswer === undefined) {
             return NextResponse.json(
@@ -26,7 +28,11 @@ export async function POST(request: NextRequest) {
 
         const question = await prisma.question.findUnique({
             where: { id: questionId },
-            include: { options: true, correctTextAnswers: true },
+            include: {
+                options: true,
+                correctTextAnswers: true,
+                explanation: true, // ✅ On inclut l'explication
+            },
         });
 
         if (!question) {
@@ -38,7 +44,7 @@ export async function POST(request: NextRequest) {
 
         let isCorrect = false;
 
-        // Déterminer la correction en fonction du type de question
+        // Logique de vérification (inchangée)
         switch (question.type) {
             case "SINGLE_CHOICE": {
                 const correctOption = question.options.find(
@@ -84,18 +90,27 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Créer l'enregistrement de la soumission
         await prisma.submission.create({
             data: {
                 userId: user.id,
                 questionId,
                 isCorrect,
                 submittedAnswer,
-                durationInSeconds: 0, // Placeholder
+                durationInSeconds: 0,
             },
         });
 
-        return NextResponse.json({ isCorrect });
+        // ✅ Si la réponse est fausse, on renvoie l'explication
+        if (!isCorrect) {
+            return NextResponse.json({
+                isCorrect: false,
+                explanation:
+                    question.explanation?.content ||
+                    "Aucune explication disponible pour cette question.",
+            });
+        }
+
+        return NextResponse.json({ isCorrect: true });
     } catch (error) {
         console.error("[SUBMIT_ANSWER_POST]", error);
         return NextResponse.json(

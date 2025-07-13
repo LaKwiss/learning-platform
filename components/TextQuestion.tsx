@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
+import { clsx } from "clsx";
 
 interface TextQuestionProps {
     value: string | null;
     onChange: (value: string) => void;
     disabled: boolean;
-    onTryAgain?: () => void; // ✅ NOUVEAU : La prop est maintenant optionnelle
+    onTryAgain?: () => void;
     isRevealed: boolean;
     correctAnswers: string[];
 }
@@ -15,18 +16,31 @@ export default function TextQuestion({
     value,
     onChange,
     disabled,
-    // ✅ CORRIGÉ : On fournit une fonction vide par défaut
     onTryAgain = () => {},
     isRevealed,
     correctAnswers,
 }: TextQuestionProps) {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // On empêche la modification si la question est "verrouillée"
+        if (disabled) return;
         onChange(event.target.value);
     };
 
     const handleClick = () => {
-        onTryAgain();
+        // Si la question est verrouillée (après une réponse fausse),
+        // un clic dans le champ équivaut à "Réessayer".
+        if (disabled) {
+            onTryAgain();
+        }
     };
+
+    // Ajout de classes pour indiquer visuellement que le champ est cliquable
+    const inputClasses = clsx(
+        "w-full p-4 border-2 border-gray-200 rounded-lg text-lg text-center focus:outline-none focus:border-blue-500",
+        {
+            "bg-gray-100 cursor-pointer": disabled,
+        }
+    );
 
     return (
         <div className="w-full text-center">
@@ -35,12 +49,14 @@ export default function TextQuestion({
                 value={value || ""}
                 onChange={handleChange}
                 onClick={handleClick}
-                disabled={disabled}
+                // Le champ n'est plus jamais "disabled", mais "readOnly"
+                // pour s'assurer que l'événement onClick fonctionne toujours.
+                readOnly={disabled}
                 placeholder="Tapez votre réponse ici..."
-                className="w-full p-4 border-2 border-gray-200 rounded-lg text-lg text-center focus:outline-none focus:border-blue-500 disabled:bg-gray-100"
+                className={inputClasses}
             />
             {isRevealed && (
-                <p className="mt-4 text-green-600 font-semibold">
+                <p className="mt-4 font-semibold text-green-600">
                     Réponse correcte : {correctAnswers[0]}
                 </p>
             )}

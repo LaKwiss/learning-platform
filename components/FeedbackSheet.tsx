@@ -1,94 +1,86 @@
 "use client";
 
-import { Check, X } from "lucide-react";
 import NextButton from "./NextButton";
-import clsx from "clsx";
 import React from "react";
+import { clsx } from "clsx";
+import { Search } from "lucide-react"; // Pour l'icône loupe
 
-type FeedbackState = "AWAITING_INPUT" | "CORRECT" | "INCORRECT";
+type FeedbackState = "CORRECT" | "INCORRECT";
 
 interface FeedbackSheetProps {
     state: FeedbackState;
-    onCheck: () => void;
-    onContinue: () => void;
+    onShowExplanation: () => void;
+    onSkipExplanation: () => void;
     onTryAgain: () => void;
-    isCheckDisabled: boolean;
 }
-
-// L'interface pour le typage reste la même
-interface StateConfig {
-    buttonText: string;
-    containerClasses: string;
-    message: string;
-    icon?: React.ReactNode;
-}
-
-const stateConfig: Record<FeedbackState, StateConfig> = {
-    AWAITING_INPUT: {
-        buttonText: "Vérifier",
-        containerClasses: "bg-white border-t-2",
-        message: "",
-    },
-    CORRECT: {
-        buttonText: "Continuer",
-        containerClasses: "bg-green-100 border-t-2 border-green-500",
-        message: "Bonne réponse !",
-        icon: <Check className="h-8 w-8 text-green-500" />,
-    },
-    INCORRECT: {
-        buttonText: "Réessayer",
-        containerClasses: "bg-red-100 border-t-2 border-red-500",
-        message: "Mauvaise réponse",
-        icon: <X className="h-8 w-8 text-red-500" />,
-    },
-};
 
 export default function FeedbackSheet({
     state,
-    onCheck,
-    onContinue,
+    onShowExplanation,
+    onSkipExplanation,
     onTryAgain,
-    isCheckDisabled,
 }: FeedbackSheetProps) {
-    const config = stateConfig[state];
+    const isCorrect = state === "CORRECT";
 
-    const handleButtonClick = () => {
-        switch (state) {
-            case "AWAITING_INPUT":
-                onCheck();
-                break;
-            case "CORRECT":
-                onContinue();
-                break;
-            case "INCORRECT":
-                onTryAgain();
-                break;
-        }
-    };
+    // Les styles de conteneur sont adaptés aux captures d'écran
+    const containerClasses = isCorrect
+        ? "bg-white border-t-2 border-gray-200"
+        : "bg-yellow-50 border-t-2 border-yellow-300";
 
-    // ✅ CORRIGÉ : Remplacé le Drawer par une div fixe
+    const title = isCorrect
+        ? "Voici la bonne réponse"
+        : "C'est incorrect. Réessayez.";
+
     return (
         <div
             className={clsx(
                 "w-full p-4 transition-all duration-300",
-                config.containerClasses
+                containerClasses
             )}
         >
-            <div className="max-w-md mx-auto flex flex-col items-center">
-                {config.icon && (
-                    <div className="flex items-center justify-center space-x-4 mb-4">
-                        {config.icon}
-                        <h2 className="font-medium text-2xl">
-                            {config.message}
+            <div className="mx-auto flex max-w-md flex-col items-center gap-4">
+                <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        {isCorrect && (
+                            <Search className="h-6 w-6 text-neutral-700" />
+                        )}
+                        <h2 className="text-lg font-bold text-neutral-800">
+                            {title}
                         </h2>
                     </div>
-                )}
-                <NextButton
-                    onClick={handleButtonClick}
-                    disabled={state === "AWAITING_INPUT" && isCheckDisabled}
-                >
-                    {config.buttonText}
-                </NextButton>
+                    {/* Emplacement pour une future icône drapeau */}
+                </div>
+
+                <div className="mt-2 flex w-full gap-4">
+                    {isCorrect ? (
+                        <>
+                            <NextButton
+                                onClick={onShowExplanation}
+                                variant="primary"
+                            >
+                                Pourquoi ?
+                            </NextButton>
+                            <NextButton
+                                onClick={onSkipExplanation}
+                                variant="secondary"
+                            >
+                                Passer l'explication
+                            </NextButton>
+                        </>
+                    ) : (
+                        <>
+                            <NextButton
+                                onClick={onShowExplanation}
+                                variant="secondary"
+                            >
+                                Voir la réponse
+                            </NextButton>
+                            <NextButton onClick={onTryAgain} variant="primary">
+                                Réessayer
+                            </NextButton>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
