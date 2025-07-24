@@ -39,9 +39,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const updatedUser = await prisma.user.update({
+        const updatedUser = await prisma.user.upsert({
             where: { clerkId: userId },
-            data: { activeModuleId: courseId },
+            update: { activeModuleId: courseId },
+            create: { clerkId: userId, activeModuleId: courseId },
         });
 
         return NextResponse.json(updatedUser);
