@@ -14,6 +14,11 @@ interface FeedbackSheetProps {
     onTryAgain: () => void;
 }
 
+const FeedbackSheetGreeting = [
+    "Excellent !", "C'est la bonne réponse !", "Bien joué !",
+    "Bravo !", "Super !", "Exactement !", "Parfait !"
+]
+
 export default function FeedbackSheet({
     state,
     onShowExplanation,
@@ -24,11 +29,11 @@ export default function FeedbackSheet({
 
     // Les styles de conteneur sont adaptés aux captures d'écran
     const containerClasses = isCorrect
-        ? "bg-white border-t-2 border-gray-200"
+        ? "bg-green-100 border-t-2 border-green-200"
         : "bg-yellow-50 border-t-2 border-yellow-300";
 
     const title = isCorrect
-        ? "Voici la bonne réponse"
+        ? FeedbackSheetGreeting[Math.floor(Math.random() * FeedbackSheetGreeting.length)]
         : "C'est incorrect. Réessayez.";
 
     return (

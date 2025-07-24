@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
             include: {
                 options: true,
                 correctTextAnswers: true,
-                explanation: true, // ✅ On inclut l'explication
+                explanation: true,
             },
         });
 
@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
 
         let isCorrect = false;
 
-        // Logique de vérification (inchangée)
         switch (question.type) {
             case "SINGLE_CHOICE": {
                 const correctOption = question.options.find(
@@ -109,6 +108,23 @@ export async function POST(request: NextRequest) {
                     "Aucune explication disponible pour cette question.",
             });
         }
+
+        // Si la réponse est correcte, l'active question est mise à jour
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { activeQuestionId: null }, // On réinitialise l'activeQuestion
+        });
+
+        // On incrémente le niveau de l'utilisateur
+        const increment: number = 5; // Valeur d'incrémentation
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                level: {
+                    increment: increment,
+                },
+            },
+        });
 
         return NextResponse.json({ isCorrect: true });
     } catch (error) {

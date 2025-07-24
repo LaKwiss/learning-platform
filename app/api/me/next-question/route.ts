@@ -55,6 +55,29 @@ export async function GET(request: NextRequest) {
             });
         }
 
+        // Si l'utilisateur avait déjà une question active, on lui la soumet
+        if (user.activeQuestionId) {
+            const activeQuestion = await prisma.question.findUnique({
+                where: { id: user.activeQuestionId },
+                include: { options: true, correctTextAnswers: true },
+            });
+            if (activeQuestion) {
+                return NextResponse.json({
+                    question: activeQuestion,
+                    progress: {
+                        completed: answeredQuestionIds.length,
+                        total: totalQuestionsInModule,
+                    },
+                });
+            }
+        }
+
+        // On sauvegarde qu'il est bien sur cette question
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { activeQuestionId: question.id },
+        });
+
         return NextResponse.json({
             question,
             progress: {

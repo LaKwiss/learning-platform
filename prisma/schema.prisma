@@ -27,9 +27,12 @@ model User {
   clerkId           String     @unique
   activeModuleId    String?
   activeModule      Module?    @relation(fields: [activeModuleId], references: [id])
+  activeQuestionId  String?    
+  activeQuestion    Question?  @relation(fields: [activeQuestionId], references: [id])
   dailyGoal         DailyGoal?
   onboardingOptions Json?
   submissions       Submission[]
+  level             Int        @default(0)
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 }
@@ -58,6 +61,7 @@ model Question {
   updatedAt            DateTime            @updatedAt
   Submission           Submission[]
   explanation          Explanation?
+  User                User[]
 }
 
 model Option {

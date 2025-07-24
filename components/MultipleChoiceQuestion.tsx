@@ -52,7 +52,6 @@ export default function MultipleChoiceQuestion(
         onTryAgain = () => {},
         layout: layoutProp,
         gridCols: gridColsProp,
-        // ✅ CORRIGÉ : On fournit des valeurs par défaut
         isRevealed = false,
         correctAnswerIds = [],
     } = props;
