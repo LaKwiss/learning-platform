@@ -109,11 +109,8 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Si la réponse est correcte, l'active question est mise à jour
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { activeQuestionId: null }, // On réinitialise l'activeQuestion
-        });
+        // ✅ Si la réponse est correcte, on continue sans reset de activeQuestionId
+        // La prochaine question sera déterminée par l'API next-question
 
         // On incrémente le niveau de l'utilisateur
         const increment: number = 5; // Valeur d'incrémentation

@@ -34,7 +34,7 @@ export default function Step2({ onNext, onBack, value, onChange }: Step2Props) {
                     >
                         <ChevronLeft size={24} />
                     </button>
-                    <ProgressBar progress={33} />
+                    <ProgressBar progress={33} previousProgress={0} />
                 </div>
             </header>
 

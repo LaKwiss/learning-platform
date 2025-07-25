@@ -17,7 +17,7 @@ export default function Step1({ onNext }: Step1Props) {
                     <button className="text-gray-500 hover:text-black">
                         <ChevronLeft size={24} />
                     </button>
-                    <ProgressBar progress={0} />
+                    <ProgressBar progress={0} previousProgress={0} />
                 </div>
             </header>
 

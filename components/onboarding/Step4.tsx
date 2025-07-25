@@ -48,7 +48,7 @@ export default function Step4({
                     >
                         <ChevronLeft size={24} />
                     </button>
-                    <ProgressBar progress={100} />
+                    <ProgressBar progress={100} previousProgress={66} />
                 </div>
             </header>
 

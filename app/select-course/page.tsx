@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import MultiChoiceQuestion from "../../components/MultipleChoiceQuestion";
 import NextButton from "../../components/NextButton";
 import Character from "../../components/onboarding/Character";
@@ -97,6 +98,15 @@ export default function SelectCoursePage() {
                             Quel cours souhaitez-vous commencer aujourd'hui ?
                         </p>
                     </div>
+                </div>
+
+                <div className="mb-6 text-center">
+                    <Link 
+                        href="/redo-course" 
+                        className="text-blue-600 underline hover:text-blue-800 text-sm"
+                    >
+                        refaire un cours
+                    </Link>
                 </div>
 
                 <MultiChoiceQuestion

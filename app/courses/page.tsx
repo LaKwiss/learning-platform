@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import Question from "../../components/Question";
 import ProgressBar from "../../components/ProgressBar";
 import FeedbackSheet from "../../components/FeedbackSheet";
@@ -16,32 +17,32 @@ export default function CoursesPage() {
     const router = useRouter();
 
     const [questionData, setQuestionData] = useState<any>(null);
+    const [nextQuestionData, setNextQuestionData] = useState<any>(null); // Pour pré-charger
     const [answer, setAnswer] = useState<any>(null);
     const [progress, setProgress] = useState({ completed: 0, total: 1 });
+    const [previousProgress, setPreviousProgress] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [feedbackState, setFeedbackState] =
         useState<FeedbackState>("AWAITING_INPUT");
     const [showExplanation, setShowExplanation] = useState(false);
     const [explanationText, setExplanationText] = useState(""); // ✅ Pour stocker le texte de l'explication
+    const [questionKey, setQuestionKey] = useState(0); // Pour forcer le re-render des questions seulement
 
     const fetchNextQuestion = useCallback(async () => {
         setLoading(true);
         setError(null);
-        setFeedbackState("AWAITING_INPUT");
-        setAnswer(null);
-        setShowExplanation(false);
-        setExplanationText(""); // On réinitialise
 
         try {
             const response = await fetch("/api/me/next-question");
             if (!response.ok) throw new Error("Failed to fetch data.");
             const data = await response.json();
             if (data.question) {
-                setQuestionData(data.question);
+                setNextQuestionData(data.question);
+                setPreviousProgress((progress.completed / progress.total) * 100);
                 setProgress(data.progress);
             } else {
-                setQuestionData(null);
+                setNextQuestionData(null);
                 alert("Félicitations, vous avez terminé le module !");
                 router.push("/home");
             }
@@ -57,6 +58,20 @@ export default function CoursesPage() {
             fetchNextQuestion();
         }
     }, [user, fetchNextQuestion]);
+
+    // Effet séparé pour appliquer la nouvelle question
+    useEffect(() => {
+        if (nextQuestionData) {
+            setQuestionData(nextQuestionData);
+            setNextQuestionData(null);
+            // Reset des états pour la nouvelle question
+            setFeedbackState("AWAITING_INPUT");
+            setAnswer(null);
+            setShowExplanation(false);
+            setExplanationText("");
+            setQuestionKey(prev => prev + 1);
+        }
+    }, [nextQuestionData]);
 
     const handleCheck = async () => {
         if (!answer) return;
@@ -82,6 +97,7 @@ export default function CoursesPage() {
     };
 
     const handleContinue = () => {
+        // On fetch la prochaine question sans démonter les composants
         fetchNextQuestion();
     };
 
@@ -115,21 +131,28 @@ export default function CoursesPage() {
 
     return (
         <div className="flex flex-col h-screen">
+            {/* ProgressBar maintenant HORS de l'AnimatePresence */}
             <header className="p-4">
                 <ProgressBar
                     progress={(progress.completed / progress.total) * 100}
+                    previousProgress={previousProgress}
                 />
             </header>
 
             <main className="flex-grow flex flex-col items-center justify-center p-4">
-                <Question
-                    question={questionData}
-                    value={answer}
-                    onChange={setAnswer}
-                    disabled={feedbackState !== "AWAITING_INPUT"}
-                    isRevealed={false}
-                    onTryAgain={handleTryAgain}
-                />
+                <AnimatePresence mode="wait">
+                    {questionData && (
+                        <Question
+                            key={questionKey} // Utilise questionKey au lieu de questionData.id
+                            question={questionData}
+                            value={answer}
+                            onChange={setAnswer}
+                            disabled={feedbackState !== "AWAITING_INPUT"}
+                            isRevealed={false}
+                            onTryAgain={handleTryAgain}
+                        />
+                    )}
+                </AnimatePresence>
             </main>
 
             <footer className="w-full">

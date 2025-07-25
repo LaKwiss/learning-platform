@@ -57,6 +57,7 @@ model Question {
   correctTextAnswers   CorrectTextAnswer[]
   moduleId             String
   module               Module              @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  orderIndex           Int                 @default(0)
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
   Submission           Submission[]

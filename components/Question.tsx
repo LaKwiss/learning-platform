@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 import TrueFalseQuestion from "./TrueFalseQuestion";
 import TextQuestion from "./TextQuestion";
@@ -23,7 +24,16 @@ export default function Question({
     isRevealed,
 }: QuestionProps) {
     return (
-        <div className="w-full max-w-lg mx-auto">
+        <motion.div 
+            className="w-full max-w-lg mx-auto"
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ 
+                duration: 0.3, 
+                ease: "easeOut" 
+            }}
+        >
             <h2 className="text-3xl font-bold text-neutral-800 mb-8 text-center">
                 {question.title}
             </h2>
@@ -73,6 +83,6 @@ export default function Question({
                     )}
                 />
             )}
-        </div>
+        </motion.div>
     );
 }
